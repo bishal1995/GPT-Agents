@@ -32,7 +32,7 @@ def load_and_parse_json_file(file_path):
 
 
 def main():
-    directory = "prompts"  # You can change this to the directory containing your text files
+    directory = "./chapter_2/prompts"  # You can change this to the directory containing your text files
     text_files = list_text_files_in_directory(directory)
 
     if not text_files:
@@ -59,13 +59,11 @@ def main():
                     print(f"PROMPT {i+1} -------------------------------------------------")
                     print(prompt)
                     print(f"REPLY -------------------------------------------------")
-                    #using OpenAI
-                    print(prompt_llm(prompt))
                     #using local LLM
-                    # print(prompt_llm(prompt, 
-                    #                  model="local-model", 
-                    #                  base_url="http://localhost:1234/v1",
-                    #                  api_key="not used"))
+                    print(prompt_llm(prompt, 
+                                     model="llama3.2:latest", 
+                                     base_url="http://localhost:11434/v1",
+                                     api_key="not used"))
             else:
                 print("Invalid choice. Please enter a valid number.")
         except ValueError:
