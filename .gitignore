@@ -167,6 +167,8 @@ cython_debug/
 *.sqlite3
 
 OAI_CONFIG_LIST
+OAI_CONFIG_LIST_OAI
+OAI_CONFIG_LIST_OLLAMA
 
 tmp*
 

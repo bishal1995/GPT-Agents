@@ -1,7 +1,7 @@
 from autogen import AssistantAgent, UserProxyAgent, config_list_from_json
 
 # Load the configuration list from the config file.
-config_list = config_list_from_json(env_or_file="OAI_CONFIG_LIST")
+config_list = config_list_from_json(env_or_file="OAI_CONFIG_LIST_OLLAMA")
 
 # Create the agent that represents the user in the conversation.
 user_proxy = UserProxyAgent(
@@ -40,25 +40,23 @@ critic = AssistantAgent(
 def review_code(recipient, messages, sender, config):
     return f"""
             Review and critque the following code.
-            
             {recipient.chat_messages_for_summary(sender)[-1]['content']}
             """
 
-
-user_proxy.register_nested_chats(
+engineer.register_nested_chats(
     [
         {
             "recipient": critic,
             "message": review_code,
             "summary_method": "last_msg",
-            "max_turns": 3,
+            "max_turns": 1,
         }
     ],
-    trigger=engineer,  # condition=my_condition,
+    trigger=user_proxy,
 )
 
-task = """Write a snake game using Pygame."""
+task = """Write a snake game using Pygame. And tell the Reviewer to review code"""
 
 res = user_proxy.initiate_chat(
-    recipient=engineer, message=task, max_turns=2, summary_method="last_msg"
+    recipient=engineer, message=task, max_turns=20, summary_method="last_msg"
 )

@@ -8,7 +8,7 @@ from autogen import (
 from autogen.cache import Cache
 
 # Load the configuration list from the config file.
-config_list = config_list_from_json(env_or_file="OAI_CONFIG_LIST")
+config_list = config_list_from_json(env_or_file="OAI_CONFIG_LIST_OLLAMA")
 
 # Create the agent that represents the user in the conversation.
 user_proxy = UserProxyAgent(
