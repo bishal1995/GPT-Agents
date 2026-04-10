@@ -1,0 +1,7 @@
+[
+    {
+        "model": "llama3.2:latest",
+        "api_key": "random",
+        "base_url": "http://localhost:11434/v1"
+    }
+]

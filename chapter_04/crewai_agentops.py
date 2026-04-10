@@ -1,9 +1,17 @@
 import agentops
+import os
 from crewai import Agent, Crew, Process, Task
 from dotenv import load_dotenv
+from langchain_ollama import OllamaLLM
 
-load_dotenv()
+
+os.environ["OPENAI_API_KEY"] = "not-needed"
 agentops.init()
+
+ollama_llm = OllamaLLM(
+    model="llama3.2:latest",   # or mistral, phi, etc.
+    base_url="http://localhost:11434/v1"
+)
 
 # Creating a senior researcher agent with memory and verbose mode
 joke_researcher = Agent(
@@ -18,6 +26,7 @@ joke_researcher = Agent(
         "a laugh riot."
     ),
     allow_delegation=True,
+    llm=ollama_llm
 )
 
 # Creating a writer agent with custom tools and delegation capability

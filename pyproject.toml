@@ -16,4 +16,6 @@ dependencies = [
     "langchain>=0.3.25",
     "pyautogen>=0.9",
     "autogen-ext[ollama]>=0.4.9.3",
+    "langchain-ollama>=1.1.0",
+    "agentops>=0.4.21",
 ]
