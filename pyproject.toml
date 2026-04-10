@@ -18,4 +18,5 @@ dependencies = [
     "autogen-ext[ollama]>=0.4.9.3",
     "langchain-ollama>=1.1.0",
     "agentops>=0.4.21",
+    "semantic-kernel>=1.36.0",
 ]
