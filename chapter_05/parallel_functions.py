@@ -1,44 +1,46 @@
 from openai import OpenAI
 import json
 from dotenv import load_dotenv
+from pprint import pprint
 
-load_dotenv()
+local_model = "llama3.2:latest"
+client=OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="not-needed"
+)
 
-client = OpenAI()
 
-
-def recommend(topic, rating="good"):
+def recommend(topic, sub_topic="Unknown"):
     """Give a recommendation for any topic"""
-    if "time travel" in topic.lower():
-        return json.dumps({"topic": "time travel",
-                           "recommendation": "Back to the Future",
-                           "rating": rating})
-    elif "recipe" in topic.lower():
-        return json.dumps({"topic": "recipe",
-                           "recommendation": "The best thing you ever ate.",
-                           "rating": rating})
-    elif "gift" in topic.lower():
-        return json.dumps({"topic": "gift",
-                           "recommendation": "A glorius new...",
-                           "rating": rating})
-    else:
-        return json.dumps({"topic": topic,
-                           "recommendation": "unknown"})
+    if topic is not None:
+        if "movie" in topic.lower():
+            return json.dumps({"topic": "movie",
+                            "sub_topic": sub_topic})
+        elif "recipe" in topic.lower():
+            return json.dumps({"topic": "recipe",
+                            "sub_topic": sub_topic})
+        elif "gift" in topic.lower():
+            return json.dumps({"topic": "gift",
+                            "sub_topic": sub_topic})
+        else:
+            return json.dumps({"topic": topic})
     
 
 def run_conversation():
     # Step 1: send the conversation and available functions to the model
-    user = """Can you please make recommendations for the following:
-    1. Time travel movies
-    2. Recipes
-    3. Gifts"""
-    messages = [{"role": "user", "content": user}]
+    user = """Can you please make recommendations for the following and also consider the sub topic mentioned about them:
+    1. Movies about history.
+    2. Recipes about sweet dish.
+    3. Gifts for Parents."""
+    messages = [
+        {"role": "user", "content": user}
+    ]
     tools = [
         {
             "type": "function",
             "function": {
                 "name": "recommend",
-                "description": "Provide a recommendation for any topic.",
+                "description": "Provide a recommendation for any topic considering the sub topic about them",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -46,25 +48,33 @@ def run_conversation():
                             "type": "string",
                             "description": "The topic, a user wants a recommnedation for.",
                             },
-                            "rating": {
-                                "type": "string",
-                                "description": "The rating this recommendation was given.",
-                                "enum": ["good", "bad", "terrible"]
-                                },
+                        "sub_topic": {
+                            "type": "string",
+                            "description": "The sub topic of the topic that this recommendation will be given."
                             },
-                    "required": ["topic"],
+                        },
+                    "required": ["topic", "sub_topic"],
                     },
                 },
             }
         ]
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-1106",
+        model=local_model,
         messages=messages,
         tools=tools,
         tool_choice="auto",  # auto is default, but we'll be explicit
+        temperature=0
     )
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
+
+    print("\n*****------------------------------------------------------------------------------*****")
+    if tool_calls:
+        for tool_call in tool_calls:
+            print("\n")
+            print(tool_call)
+    print("\n*****------------------------------------------------------------------------------*****")
+
     # Step 2: check if the model wanted to call a function
     if tool_calls:
         # Step 3: call the function
@@ -80,7 +90,7 @@ def run_conversation():
             function_args = json.loads(tool_call.function.arguments)
             function_response = function_to_call(
                 topic=function_args.get("topic"),
-                rating=function_args.get("rating"),
+                sub_topic=function_args.get("sub_topic"),
             )
             messages.append(
                 {
@@ -91,8 +101,9 @@ def run_conversation():
                 }
             )  # extend conversation with function response
         second_response = client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model=local_model,
             messages=messages,
+            temperature=0
         )  # get a new response from the model where it can see the function response
         return second_response.choices[0].message.content
 
