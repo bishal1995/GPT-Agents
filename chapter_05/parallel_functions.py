@@ -3,7 +3,7 @@ import json
 from dotenv import load_dotenv
 from pprint import pprint
 
-local_model = "llama3.2:latest"
+local_model = "gemma4:latest"
 client=OpenAI(
     base_url="http://localhost:11434/v1",
     api_key="not-needed"
